@@ -2,7 +2,7 @@
 
 | Nombre | Usuario GitHub | Slice o responsabilidad | Revisión realizada |
 |---|---|---|---|
-| Antonio | @nenooodev (confirmar) | Entregas 1–3: eco, CRUD JSON en memoria y ResponseEntity. Tests propios de flujo y documentación E1–E3. | Pendiente: revisar E4–E6 de @mamarod428 |
+| Antonio | @nenooodev (confirmar) | Entregas 1–3: eco, CRUD JSON en memoria y ResponseEntity. Tests propios de flujo y documentación E1–E3. | Pendiente: revisar E4–E6 de Manuel |
 | Manuel | @mamarod428 | Entregas 4–6: `BookService`, excepciones propias y `GlobalExceptionHandler`. Tests unitarios del servicio. | Pendiente: revisar E1–E3 de Antonio |
 
 Registrar contribuciones propias y colaboración; no compartir cuentas.
@@ -21,7 +21,7 @@ recorren el mismo camino.
 ## Orden de integración
 
 1. Antonio cierra E1–E3 en ramas `feat/entrega-N-antonio` y PR a `main`.
-2. @mamarod428 parte del `main` con E3 verde para E4–E6.
+2. Manuel parte del `main` con E3 verde para E4–E6.
 3. Revisión cruzada: cada integrante revisa el slice del otro y lo registra aquí.
 4. Regresión final: semilla 6 + todos los tests propios del CRUD.
 
