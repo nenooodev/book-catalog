@@ -5,6 +5,7 @@ import com.example.catalog.dto.BookResponseDTO;
 import com.example.catalog.model.Book;
 import com.example.catalog.repository.InMemoryBookRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -42,9 +44,10 @@ public class BookController {
     }
 
     @PostMapping
-    public BookResponseDTO create(@RequestBody BookRequestDTO request) {
+    public ResponseEntity<BookResponseDTO> create(@RequestBody BookRequestDTO request) {
         Book saved = repository.save(request.toModel(null));
-        return BookResponseDTO.from(saved);
+        BookResponseDTO response = BookResponseDTO.from(saved);
+        return ResponseEntity.created(URI.create("/books/" + response.id())).body(response);
     }
 
     @PutMapping("/{id}")
@@ -56,9 +59,10 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         if (!repository.deleteById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found");
         }
+        return ResponseEntity.noContent().build();
     }
 }
