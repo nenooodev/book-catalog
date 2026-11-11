@@ -74,4 +74,23 @@ class BookCrudFlowTest {
         assertNotEquals(first, second);
         mvc.perform(get("/books")).andExpect(jsonPath("$", hasSize(2)));
     }
+
+    @Test
+    void getReturnsCreatedBook() throws Exception {
+        long id = create();
+
+        mvc.perform(get("/books/" + id).accept("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.isbn").value("978-1"))
+                .andExpect(jsonPath("$.title").value("DDD"))
+                .andExpect(jsonPath("$.author").value("Evans"))
+                .andExpect(jsonPath("$.year").value(2003));
+    }
+
+    @Test
+    void getMissingReturns404() throws Exception {
+        mvc.perform(get("/books/999999")).andExpect(status().isNotFound());
+    }
 }
