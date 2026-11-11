@@ -1,14 +1,33 @@
 package com.example.catalog.web;
 
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import com.example.catalog.dto.BookResponseDTO;
+import com.example.catalog.repository.InMemoryBookRepository;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
-@RequestMapping(value = "/books", produces = MediaType.TEXT_PLAIN_VALUE)
+@RequestMapping("/books")
 public class BookController {
 
+    private final InMemoryBookRepository repository;
+
+    public BookController(InMemoryBookRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public String list() { return "GET /books"; }
+    public List<BookResponseDTO> list() {
+        return repository.findAll().stream()
+                .map(BookResponseDTO::from)
+                .toList();
+    }
 
     @GetMapping("/{id}")
     public String getOne(@PathVariable("id") Long id) { return "GET /books/" + id; }
