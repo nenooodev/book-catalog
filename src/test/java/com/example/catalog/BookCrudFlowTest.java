@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,5 +93,31 @@ class BookCrudFlowTest {
     @Test
     void getMissingReturns404() throws Exception {
         mvc.perform(get("/books/999999")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateKeepsIdAndChangesFields() throws Exception {
+        long id = create();
+
+        mvc.perform(put("/books/" + id).contentType("application/json").content("""
+                        {"isbn":"978-2","title":"Refactoring","author":"Fowler","year":2018}
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.isbn").value("978-2"))
+                .andExpect(jsonPath("$.title").value("Refactoring"))
+                .andExpect(jsonPath("$.author").value("Fowler"))
+                .andExpect(jsonPath("$.year").value(2018));
+
+        mvc.perform(get("/books/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Refactoring"));
+    }
+
+    @Test
+    void updateMissingReturns404() throws Exception {
+        mvc.perform(put("/books/999999").contentType("application/json").content(BOOK))
+                .andExpect(status().isNotFound());
     }
 }
