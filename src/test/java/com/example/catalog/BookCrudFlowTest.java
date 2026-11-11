@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -119,5 +120,24 @@ class BookCrudFlowTest {
     void updateMissingReturns404() throws Exception {
         mvc.perform(put("/books/999999").contentType("application/json").content(BOOK))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteRemovesOnlyCreatedBook() throws Exception {
+        long first = create();
+        long second = create();
+
+        mvc.perform(delete("/books/" + first)).andExpect(status().isOk());
+
+        mvc.perform(get("/books"))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(second));
+        mvc.perform(get("/books/" + first)).andExpect(status().isNotFound());
+        mvc.perform(get("/books/" + second)).andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteMissingReturns404() throws Exception {
+        mvc.perform(delete("/books/999999")).andExpect(status().isNotFound());
     }
 }
