@@ -1,12 +1,15 @@
 package com.example.catalog.web;
 
+import com.example.catalog.dto.BookRequestDTO;
 import com.example.catalog.dto.BookResponseDTO;
+import com.example.catalog.model.Book;
 import com.example.catalog.repository.InMemoryBookRepository;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +36,10 @@ public class BookController {
     public String getOne(@PathVariable("id") Long id) { return "GET /books/" + id; }
 
     @PostMapping
-    public String create() { return "POST /books"; }
+    public BookResponseDTO create(@RequestBody BookRequestDTO request) {
+        Book saved = repository.save(request.toModel(null));
+        return BookResponseDTO.from(saved);
+    }
 
     @PutMapping("/{id}")
     public String update(@PathVariable("id") Long id) { return "PUT /books/" + id; }
