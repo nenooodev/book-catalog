@@ -48,7 +48,12 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public String update(@PathVariable("id") Long id) { return "PUT /books/" + id; }
+    public BookResponseDTO update(@PathVariable("id") Long id, @RequestBody BookRequestDTO request) {
+        repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+        Book saved = repository.save(request.toModel(id));
+        return BookResponseDTO.from(saved);
+    }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") Long id) { return "DELETE /books/" + id; }
