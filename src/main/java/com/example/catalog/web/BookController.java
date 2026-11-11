@@ -30,17 +30,19 @@ public class BookController {
     }
 
     @GetMapping
-    public List<BookResponseDTO> list() {
-        return repository.findAll().stream()
+    public ResponseEntity<List<BookResponseDTO>> list() {
+        List<BookResponseDTO> books = repository.findAll().stream()
                 .map(BookResponseDTO::from)
                 .toList();
+        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/{id}")
-    public BookResponseDTO getOne(@PathVariable("id") Long id) {
-        return repository.findById(id)
+    public ResponseEntity<BookResponseDTO> getOne(@PathVariable("id") Long id) {
+        BookResponseDTO book = repository.findById(id)
                 .map(BookResponseDTO::from)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+        return ResponseEntity.ok(book);
     }
 
     @PostMapping
@@ -51,11 +53,11 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public BookResponseDTO update(@PathVariable("id") Long id, @RequestBody BookRequestDTO request) {
+    public ResponseEntity<BookResponseDTO> update(@PathVariable("id") Long id, @RequestBody BookRequestDTO request) {
         repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         Book saved = repository.save(request.toModel(id));
-        return BookResponseDTO.from(saved);
+        return ResponseEntity.ok(BookResponseDTO.from(saved));
     }
 
     @DeleteMapping("/{id}")
