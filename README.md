@@ -155,6 +155,6 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 ### Contribución
 
-Antonio (@nenooodev) implementa el slice de las entregas 1–2 y sus pruebas. La
-revisión cruzada con @mamarod428 se registrará en `equipo.md`.
+Antonio implementa el slice de las entregas 1–2 y sus pruebas. La revisión
+cruzada con Manuel se registrará en `equipo.md`.
 
