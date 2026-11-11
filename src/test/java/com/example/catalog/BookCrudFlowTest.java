@@ -1,5 +1,6 @@
 package com.example.catalog;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,7 +9,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,11 +35,43 @@ class BookCrudFlowTest {
     @Autowired
     MockMvc mvc;
 
+    private long create() throws Exception {
+        String json = mvc.perform(post("/books").contentType("application/json").content(BOOK))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.title").value("DDD"))
+                .andReturn().getResponse().getContentAsString();
+        return ((Number) JsonPath.read(json, "$.id")).longValue();
+    }
+
     @Test
     void emptyCatalogReturnsJsonArray() throws Exception {
         mvc.perform(get("/books").accept("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    void createReturnsGeneratedIdAndFields() throws Exception {
+        long id = create();
+
+        mvc.perform(get("/books").accept("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(id))
+                .andExpect(jsonPath("$[0].isbn").value("978-1"))
+                .andExpect(jsonPath("$[0].author").value("Evans"))
+                .andExpect(jsonPath("$[0].year").value(2003));
+    }
+
+    @Test
+    void createAssignsDistinctIds() throws Exception {
+        long first = create();
+        long second = create();
+
+        assertNotEquals(first, second);
+        mvc.perform(get("/books")).andExpect(jsonPath("$", hasSize(2)));
     }
 }
