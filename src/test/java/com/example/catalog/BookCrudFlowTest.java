@@ -7,14 +7,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,12 +43,29 @@ class BookCrudFlowTest {
 
     private long create() throws Exception {
         String json = mvc.perform(post("/books").contentType("application/json").content(BOOK))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", startsWith("/books/")))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.title").value("DDD"))
                 .andReturn().getResponse().getContentAsString();
         return ((Number) JsonPath.read(json, "$.id")).longValue();
+    }
+
+    @Test
+    void createdLocationIsExactAndUsable() throws Exception {
+        MvcResult result = mvc.perform(post("/books").contentType("application/json").content(BOOK))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", startsWith("/books/")))
+                .andReturn();
+
+        long id = ((Number) JsonPath.read(result.getResponse().getContentAsString(), "$.id")).longValue();
+        String location = result.getResponse().getHeader("Location");
+
+        assertEquals("/books/" + id, location);
+        mvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
@@ -127,7 +148,9 @@ class BookCrudFlowTest {
         long first = create();
         long second = create();
 
-        mvc.perform(delete("/books/" + first)).andExpect(status().isOk());
+        mvc.perform(delete("/books/" + first))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
 
         mvc.perform(get("/books"))
                 .andExpect(jsonPath("$", hasSize(1)))
