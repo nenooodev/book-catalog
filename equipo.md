@@ -2,7 +2,7 @@
 
 | Nombre | Usuario GitHub | Slice o responsabilidad | Revisión realizada |
 |---|---|---|---|
-| Antonio | @nenooodev (confirmar) | Entregas 1–3: eco, CRUD JSON en memoria y ResponseEntity. Tests propios de flujo y documentación E1–E3. | Pendiente: revisar E4–E6 de Manuel |
+| Antonio | @nenooodev | Entregas 1–3: eco, CRUD JSON en memoria y ResponseEntity. Tests propios de flujo y documentación E1–E3. | Pendiente: revisar E4–E6 de Manuel |
 | Manuel | @mamarod428 | Entregas 4–6: `BookService`, excepciones propias y `GlobalExceptionHandler`. Tests unitarios del servicio. | Pendiente: revisar E1–E3 de Antonio |
 
 Registrar contribuciones propias y colaboración; no compartir cuentas.
@@ -35,3 +35,17 @@ recorren el mismo camino.
 
 Cada commit es pequeño; se ejecuta el test afectado antes de commitear y la suite
 completa antes de abrir el PR de la entrega.
+
+## Contribuciones y handoff
+
+- **Antonio (E1–E3):** eco y caracterización, CRUD JSON con repositorio en memoria,
+  `ResponseEntity` con `201 + Location` y `204`, tests propios de flujo y
+  documentación en README y `aprendizaje.md`.
+- **Manuel (E4–E6):** extraer `BookService` con las cinco firmas del contrato,
+  añadir `BookNotFoundException` e `InvalidBookException` con su mapeo local y
+  cerrar con `GlobalExceptionHandler` y validación.
+- **Estado al cerrar E3:** `main` tiene el CRUD completo, DTOs estables y el
+  controlador devolviendo `ResponseEntity`. La colección vive en
+  `InMemoryBookRepository`; en E4 solo hay que mover las reglas al servicio.
+- **Revisión cruzada:** Antonio revisará E4–E6 y Manuel revisará E1–E3. La
+  revisión se anota en la tabla superior al completarse.
