@@ -104,26 +104,42 @@ La **sesión 5 de Battleship** enseña el advice que se aplica a la **entrega 6 
 Book Catalog**. No confundir los dos números. Al acabar, cada integrante debe
 poder ejecutar y defender su slice, sus pruebas y su contribución en Git.
 
-## 6. Slice implementado: entregas 1–2
+## 6. Slice implementado: entregas 1–3
 
-### Contrato HTTP de la entrega 2
+### Contrato HTTP de la entrega 3
 
 | Operación | Ruta | Éxito | Cuerpo de entrada | Cuerpo de salida |
 |---|---|---|---|---|
 | Listar | `GET /books` | `200` | — | array de `BookResponseDTO` |
 | Consultar | `GET /books/{id}` | `200` | — | `BookResponseDTO` |
-| Crear | `POST /books` | `200` | `BookRequestDTO` | `BookResponseDTO` con id |
+| Crear | `POST /books` | `201` + `Location: /books/{id}` | `BookRequestDTO` | `BookResponseDTO` con id |
 | Actualizar | `PUT /books/{id}` | `200` | `BookRequestDTO` | `BookResponseDTO` con el mismo id |
-| Borrar | `DELETE /books/{id}` | `200` | — | vacío |
+| Borrar | `DELETE /books/{id}` | `204` | — | vacío |
 
-Un id inexistente en `GET`, `PUT` o `DELETE` responde `404`. Es un caso propio de
-la entrega 2 que se sustituirá en la entrega 5 por `BookNotFoundException`.
+La `Location` es relativa (`/books/{id}`) y se puede usar directamente en un `GET`
+posterior. El controlador devuelve `ResponseEntity` en las cinco operaciones para
+expresar el estado y las cabeceras. Un id inexistente en `GET`, `PUT` o `DELETE`
+responde `404`; es un caso propio de la entrega 2 que se sustituirá en la entrega
+5 por `BookNotFoundException`.
 
 ```json
 {"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
 ```
 
 ```json
+{"id":1,"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
+```
+
+```http
+POST /books HTTP/1.1
+Content-Type: application/json
+
+{"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
+
+HTTP/1.1 201 Created
+Location: /books/1
+Content-Type: application/json
+
 {"id":1,"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
 ```
 
@@ -137,14 +153,17 @@ la entrega 2 que se sustituirá en la entrega 5 por `BookNotFoundException`.
   4 la lógica de negocio se moverá a `BookService`.
 - **Formato JSON:** se retira `produces = text/plain`; el contenido se negocia como
   `application/json`.
-- **Tests independientes:** cada test crea su propio recurso y sigue el id
-  devuelto. `BookCrudFlowTest` reinicia el contexto después de cada método porque
-  comprueba el contenido de una colección compartida.
+- **Códigos HTTP:** `201` para el alta con `Location`, `204` sin cuerpo para el
+  borrado y `200` para consultas y actualización.
+- **Tests independientes:** cada test crea su propio recurso y sigue el id o la
+  `Location` devueltos. `BookCrudFlowTest` reinicia el contexto después de cada
+  método porque comprueba el contenido de una colección compartida.
 
 ### Pruebas propias
 
 - `BookCrudFlowTest`: listado vacío, alta con id generado, ids distintos, consulta,
-  actualización, borrado selectivo y `404` en ids inexistentes.
+  actualización, borrado selectivo, `Location` exacta y reutilizable, `204` con
+  cuerpo vacío y `404` en ids inexistentes.
 - `CatalogApplicationTests`: el contexto sigue arrancando.
 
 ```bash
@@ -155,6 +174,5 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 ### Contribución
 
-Antonio implementa el slice de las entregas 1–2 y sus pruebas. La revisión
+Antonio implementa el slice de las entregas 1–3 y sus pruebas. La revisión
 cruzada con Manuel se registrará en `equipo.md`.
-
