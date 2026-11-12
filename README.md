@@ -103,3 +103,58 @@ alternativas por cada etapa ni se piden capturas como evidencia principal.
 La **sesión 5 de Battleship** enseña el advice que se aplica a la **entrega 6 de
 Book Catalog**. No confundir los dos números. Al acabar, cada integrante debe
 poder ejecutar y defender su slice, sus pruebas y su contribución en Git.
+
+## 6. Slice implementado: entregas 1–2
+
+### Contrato HTTP de la entrega 2
+
+| Operación | Ruta | Éxito | Cuerpo de entrada | Cuerpo de salida |
+|---|---|---|---|---|
+| Listar | `GET /books` | `200` | — | array de `BookResponseDTO` |
+| Consultar | `GET /books/{id}` | `200` | — | `BookResponseDTO` |
+| Crear | `POST /books` | `200` | `BookRequestDTO` | `BookResponseDTO` con id |
+| Actualizar | `PUT /books/{id}` | `200` | `BookRequestDTO` | `BookResponseDTO` con el mismo id |
+| Borrar | `DELETE /books/{id}` | `200` | — | vacío |
+
+Un id inexistente en `GET`, `PUT` o `DELETE` responde `404`. Es un caso propio de
+la entrega 2 que se sustituirá en la entrega 5 por `BookNotFoundException`.
+
+```json
+{"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
+```
+
+```json
+{"id":1,"isbn":"978-1","title":"DDD","author":"Evans","year":2003}
+```
+
+### Decisiones
+
+- **Almacenamiento en memoria:** `InMemoryBookRepository` conserva los libros y
+  genera ids crecientes. No se usa JPA, H2 ni seguridad.
+- **Modelo y DTOs separados:** `Book` es el modelo interno; el controlador solo
+  devuelve `BookResponseDTO`. La entrada se valida contra `BookRequestDTO`.
+- **Controlador delgado:** traduce HTTP y delega en el repositorio. En la entrega
+  4 la lógica de negocio se moverá a `BookService`.
+- **Formato JSON:** se retira `produces = text/plain`; el contenido se negocia como
+  `application/json`.
+- **Tests independientes:** cada test crea su propio recurso y sigue el id
+  devuelto. `BookCrudFlowTest` reinicia el contexto después de cada método porque
+  comprueba el contenido de una colección compartida.
+
+### Pruebas propias
+
+- `BookCrudFlowTest`: listado vacío, alta con id generado, ids distintos, consulta,
+  actualización, borrado selectivo y `404` en ids inexistentes.
+- `CatalogApplicationTests`: el contexto sigue arrancando.
+
+```bash
+export JAVA_HOME="$HOME/.jdks/temurin-25.0.4.1"
+export PATH="$JAVA_HOME/bin:$PATH"
+./mvnw test
+```
+
+### Contribución
+
+Antonio implementa el slice de las entregas 1–2 y sus pruebas. La revisión
+cruzada con Manuel se registrará en `equipo.md`.
+
