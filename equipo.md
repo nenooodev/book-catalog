@@ -3,7 +3,7 @@
 | Nombre | Usuario GitHub | Slice o responsabilidad | Revisión realizada |
 |---|---|---|---|
 | Antonio | @nenooodev | Entregas 1–3: eco, CRUD JSON en memoria y ResponseEntity. Tests propios de flujo y documentación E1–E3. | Pendiente: revisar E4–E6 de Manuel |
-| Manuel | @mamarod428 | Entregas 4–6: `BookService`, excepciones propias y `GlobalExceptionHandler`. Tests unitarios del servicio. | Pendiente: revisar E1–E3 de Antonio |
+| Manuel | @mamarod428 | Entregas 4–6: `BookService`, excepciones propias y `GlobalExceptionHandler`. Tests unitarios del servicio. | Realizada: revisión de E1–E3 de Antonio (commits, tests de flujo y contrato HTTP verificados) |
 
 Registrar contribuciones propias y colaboración; no compartir cuentas.
 
