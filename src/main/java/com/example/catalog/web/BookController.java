@@ -2,18 +2,21 @@ package com.example.catalog.web;
 
 import com.example.catalog.dto.BookRequestDTO;
 import com.example.catalog.dto.BookResponseDTO;
+import com.example.catalog.service.BookNotFoundException;
 import com.example.catalog.service.BookService;
+import com.example.catalog.service.InvalidBookException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.List;
@@ -35,11 +38,7 @@ public class BookController {
 
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDTO> getOne(@PathVariable("id") Long id) {
-        BookResponseDTO book = service.get(id);
-        if (book == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found");
-        }
-        return ResponseEntity.ok(book);
+        return ResponseEntity.ok(service.get(id));
     }
 
     @PostMapping
@@ -50,16 +49,22 @@ public class BookController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BookResponseDTO> update(@PathVariable("id") Long id, @RequestBody BookRequestDTO request) {
-        BookResponseDTO updated = service.update(id, request);
-        if (updated == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found");
-        }
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(service.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(BookNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleNotFound() {
+    }
+
+    @ExceptionHandler(InvalidBookException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handleInvalidBook() {
     }
 }

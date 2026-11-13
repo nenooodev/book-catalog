@@ -59,6 +59,21 @@ class BookServiceTest {
         BookResponseDTO created = service.create(new BookRequestDTO("978-1", "To Delete", "Author", 2020));
         service.delete(created.id());
 
-        assertNull(service.get(created.id()));
+        assertThrows(BookNotFoundException.class, () -> service.get(created.id()));
+    }
+
+    @Test
+    void getMissingThrowsNotFound() {
+        assertThrows(BookNotFoundException.class, () -> service.get(999L));
+    }
+
+    @Test
+    void createNullThrowsInvalidBook() {
+        assertThrows(InvalidBookException.class, () -> service.create(null));
+    }
+
+    @Test
+    void deleteMissingThrowsNotFound() {
+        assertThrows(BookNotFoundException.class, () -> service.delete(999L));
     }
 }
