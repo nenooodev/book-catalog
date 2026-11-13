@@ -101,3 +101,29 @@
 - **Contribuciones, revisión y siguiente paso:** Manuel implementa la extracción de `BookService`,
   refactoriza `BookController`, añade `BookServiceTest` y pasa la semilla 4. La entrega 5
   introducirá las excepciones de negocio y su traducción a errores HTTP.
+
+## Entrega 5 — Excepciones específicas y mapeo local
+
+- **Comportamiento que añadimos o contrato que evolucionamos:** definimos excepciones de
+  negocio desacopladas de HTTP (`BookNotFoundException` e `InvalidBookException`). El servicio
+  las lanza cuando una regla de dominio falla (recurso no encontrado o entrada no aceptada).
+  El controlador las traduce localmente con `@ExceptionHandler` a códigos `404 Not Found` y
+  `400 Bad Request`.
+- **Test y rojo observado:** al activar la semilla 5 (`BookCheckpoint05Test`), el proyecto
+  no compila porque las clases `BookNotFoundException` e `InvalidBookException` no existían en
+  `com.example.catalog.service`.
+- **Cambio mínimo y resultado verde:** se crean las dos excepciones heredando de `RuntimeException`.
+  `BookService` lanza `BookNotFoundException` en `get`, `update` y `delete` si el id no existe,
+  e `InvalidBookException` si faltan campos obligatorios. En `BookController` se añaden
+  `@ExceptionHandler(BookNotFoundException.class)` con `@ResponseStatus(HttpStatus.NOT_FOUND)` y
+  `@ExceptionHandler(InvalidBookException.class)` con `@ResponseStatus(HttpStatus.BAD_REQUEST)`.
+  Se amplían las pruebas unitarias en `BookServiceTest` verificando que el servicio lanza las
+  excepciones esperadas con `assertThrows`.
+- **Refactorización:** se eliminan las comprobaciones defensivas manuales dispersas en el controlador;
+  el controlador confía en que el servicio valida y lanza excepciones de negocio.
+- **Decisiones sobre capas y contrato HTTP:** el servicio no conoce códigos numéricos HTTP ni
+  `HttpStatus`; solo lanza excepciones de aplicación. La traducción a códigos de estado la
+  hace la capa web. En la entrega 6, este mapeo local se trasladará al `@RestControllerAdvice` global.
+- **Contribuciones, revisión y siguiente paso:** Manuel implementa las excepciones, su lanzamiento en
+  `BookService`, el mapeo en `BookController` y amplía `BookServiceTest`. La entrega 6 centralizará
+  el manejo con `GlobalExceptionHandler` y validación Bean Validation.
