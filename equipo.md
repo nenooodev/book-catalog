@@ -43,9 +43,8 @@ completa antes de abrir el PR de la entrega.
   documentación en README y `aprendizaje.md`.
 - **Manuel (E4–E6):** extraer `BookService` con las cinco firmas del contrato,
   añadir `BookNotFoundException` e `InvalidBookException` con su mapeo local y
-  cerrar con `GlobalExceptionHandler` y validación.
-- **Estado al cerrar E3:** `main` tiene el CRUD completo, DTOs estables y el
-  controlador devolviendo `ResponseEntity`. La colección vive en
-  `InMemoryBookRepository`; en E4 solo hay que mover las reglas al servicio.
+  cerrar con `GlobalExceptionHandler` y validación Bean Validation. Implementado y verificado con tests.
+- **Estado al cerrar E6:** arquitectura completa por capas terminada (Controller → Service → Repository),
+  errores JSON uniformes centralizados con `@RestControllerAdvice` y validación declarativa activa.
 - **Revisión cruzada:** Antonio revisará E4–E6 y Manuel revisará E1–E3. La
   revisión se anota en la tabla superior al completarse.

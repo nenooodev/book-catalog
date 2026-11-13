@@ -127,3 +127,24 @@
 - **Contribuciones, revisión y siguiente paso:** Manuel implementa las excepciones, su lanzamiento en
   `BookService`, el mapeo en `BookController` y amplía `BookServiceTest`. La entrega 6 centralizará
   el manejo con `GlobalExceptionHandler` y validación Bean Validation.
+
+## Entrega 6 — Advice global y validación Bean Validation
+
+- **Comportamiento que añadimos o contrato que evolucionamos:** centralización completa del manejo
+  de errores mediante `@RestControllerAdvice` con cuerpo uniforme JSON (`error`, `message`, `timestamp`).
+  Validación declarativa con Bean Validation (`@Valid`, `@NotBlank`, `@Min(0)`).
+- **Test y rojo observado:** al activar la semilla 6 (`BookCheckpoint06Test`), falla la compilación
+  por ausencia de `GlobalExceptionHandler`. Al crearlo, los tests verifican que ante errores 404,
+  400 y 500 se recibe el payload esperado, que una entrada inválida se corta antes de invocar al
+  servicio (`verifyNoInteractions(service)`) y que ante un error 500 inesperado el mensaje devuelto es
+  estrictamente `"Unexpected error"` sin exponer detalles internos.
+- **Cambio mínimo y resultado verde:** se crea `ErrorResponseDTO`, se añade `@Valid` y anotaciones
+  en `BookRequestDTO`, se implementa `GlobalExceptionHandler` y se retiran los handlers locales de
+  `BookController`. Toda la suite pasa en verde.
+- **Refactorización:** arquitectura limpia de 3 capas con separación de responsabilidades:
+  Controller (rutas y contratos HTTP) → Service (casos de uso) → Repository (memoria),
+  más `@RestControllerAdvice` para el tratamiento transversal de excepciones.
+- **Decisiones sobre capas y contrato HTTP:** el Advice centralizado garantiza que cualquier error de la
+  API tenga una estructura predecible para el cliente, cumpliendo RA7.a-f.
+- **Contribuciones, revisión y siguiente paso:** Manuel completa las entregas 4, 5 y 6. El proyecto
+  queda listo para la integración en `main` y la defensa individual.
