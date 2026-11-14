@@ -75,3 +75,29 @@
 - **Contribuciones, revisión y siguiente paso:** Antonio implementa y documenta el
   checkpoint. El `main` queda listo para que Manuel extraiga `BookService` en
   la entrega 4 sin cambiar el contrato HTTP.
+
+## Entrega 4 — Capa de servicio y delegación
+
+- **Comportamiento que añadimos o contrato que evolucionamos:** se extrae la lógica
+  de negocio y orquestación del controlador a `BookService` (`@Service`). El controlador
+  queda como una capa delgada (*thin controller*) que se encarga exclusivamente de traducir
+  peticiones y respuestas HTTP delegando en el servicio. El contrato HTTP externo se mantiene
+  inalterado (códigos 200, 201+Location, 204).
+- **Test y rojo observado:** al activar la semilla 4 (`BookCheckpoint04Test`), no compila
+  porque `BookService` no existe en `com.example.catalog.service`. Tras crear la firma del servicio,
+  la semilla verifica mediante `@MockitoBean BookService service` que el controlador delega
+  efectivamente cada una de las 5 operaciones y usa el resultado retornado por el mock.
+- **Cambio mínimo y resultado verde:** se crea `BookService` inyectando `InMemoryBookRepository`
+  por constructor. `BookController` inyecta `BookService` y delega sus cinco métodos:
+  `list()`, `get(id)`, `create(request)`, `update(id, request)` y `delete(id)`. Se añaden
+  tests unitarios en `BookServiceTest` para verificar el funcionamiento real del servicio
+  con almacenamiento en memoria sin necesidad de levantar contexto web.
+- **Refactorización:** el servicio queda limpio de cualquier dependencia o importación
+  del paquete web (`ResponseEntity`, `HttpStatus`, `@PathVariable`). Toda la lógica de negocio
+  reside en el servicio y el controlador solo gestiona la semántica HTTP.
+- **Decisiones sobre capas y contrato HTTP:** se cumple RA5.b aislando la lógica de negocio
+  en el servicio. Las excepciones de negocio específicas (`BookNotFoundException`) se reservan
+  para la entrega 5 según el roadmap de la práctica.
+- **Contribuciones, revisión y siguiente paso:** Manuel implementa la extracción de `BookService`,
+  refactoriza `BookController`, añade `BookServiceTest` y pasa la semilla 4. La entrega 5
+  introducirá las excepciones de negocio y su traducción a errores HTTP.
