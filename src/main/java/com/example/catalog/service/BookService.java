@@ -26,24 +26,32 @@ public class BookService {
     public BookResponseDTO get(Long id) {
         return repository.findById(id)
                 .map(BookResponseDTO::from)
-                .orElse(null);
+                .orElseThrow(() -> new BookNotFoundException("Book not found"));
     }
 
     public BookResponseDTO create(BookRequestDTO request) {
+        if (request == null || request.isbn() == null || request.title() == null) {
+            throw new InvalidBookException("Book not accepted");
+        }
         Book saved = repository.save(request.toModel(null));
         return BookResponseDTO.from(saved);
     }
 
     public BookResponseDTO update(Long id, BookRequestDTO request) {
+        if (request == null || request.isbn() == null || request.title() == null) {
+            throw new InvalidBookException("Book not accepted");
+        }
         return repository.findById(id)
                 .map(existing -> {
                     Book updated = repository.save(request.toModel(id));
                     return BookResponseDTO.from(updated);
                 })
-                .orElse(null);
+                .orElseThrow(() -> new BookNotFoundException("Book not found"));
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        if (!repository.deleteById(id)) {
+            throw new BookNotFoundException("Book not found");
+        }
     }
 }
